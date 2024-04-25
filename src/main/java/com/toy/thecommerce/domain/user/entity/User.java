@@ -2,12 +2,12 @@ package com.toy.thecommerce.domain.user.entity;
 
 import static lombok.AccessLevel.PROTECTED;
 
+import com.toy.thecommerce.domain.user.dto.SignUpRequest;
 import com.toy.thecommerce.global.entity.BaseEntity;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,5 +35,16 @@ public class User extends BaseEntity {
   private String phone;
 
   private String email;
+
+  public static User from(SignUpRequest request, String encodedPassword) {
+    return User.builder()
+        .userId(request.getUserId())
+        .password(encodedPassword)
+        .nickname(request.getNickname())
+        .username(request.getUsername())
+        .phone(request.getPhone())
+        .email(request.getEmail())
+        .build();
+  }
 
 }
