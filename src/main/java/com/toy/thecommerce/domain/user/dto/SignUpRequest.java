@@ -35,7 +35,7 @@ public class SignUpRequest {
 
   @NotNull(message = "반드시 값이 있어야 합니다.")
   @Pattern(regexp = "^([a-zA-Z]+|[가-힣]+){2,10}$",
-      message = "닉네임은 영어 대,소문자만 작성하거나 한글로만 작성된 공백없는 2~10자여야 합니다.")
+      message = "회원명은 영어 대,소문자만 작성하거나 한글로만 작성된 공백없는 2~10자여야 합니다.")
   @Schema(description = "회원 이름: 영어 대,소문자만 작성하거나 한글로만 작성된 공백없는 2~10자")
   private String username;
 
