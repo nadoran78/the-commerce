@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.toy.thecommerce.global.type.ErrorCode;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +36,8 @@ public class ErrorResponse {
       return null;
     }
 
-    List<Object> errorList = Collections.singletonList(
-        errors.stream().map(ValidationError::from));
+    List<Object> errorList = Collections.unmodifiableList(
+        errors.stream().map(ValidationError::from).collect(Collectors.toList()));
 
     return ErrorResponse.builder()
         .errorCode(ARGUMENT_NOT_VALID)
