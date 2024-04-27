@@ -30,7 +30,7 @@ public class MaskingUtils {
    */
   public static String maskingEmail(String email) {
     String[] splitEmail = email.split("@");
-    return maskingUserIdOrName(splitEmail[0]) + splitEmail[1];
+    return maskingUserIdOrName(splitEmail[0]) + "@" + splitEmail[1];
   }
 
   /**
@@ -39,7 +39,7 @@ public class MaskingUtils {
    */
   public static String maskingPhone(String phone) {
     phone = addHyphen(phone);
-    return phone.substring(0, 3) + "****" + phone.substring(phone.length() - 4);
+    return phone.substring(0, 3) + "-****-" + phone.substring(phone.length() - 4);
   }
 
   private static String addHyphen (String phone) {
