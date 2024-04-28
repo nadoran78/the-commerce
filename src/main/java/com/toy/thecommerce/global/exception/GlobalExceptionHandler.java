@@ -9,6 +9,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import com.fasterxml.jackson.core.io.JsonEOFException;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -46,6 +47,17 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
   public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
       MethodArgumentTypeMismatchException e, HttpServletRequest request) {
+    log.error("MethodArgumentTypeMismatchException is occurred. uri:{}",
+        request.getRequestURI());
+
+    return ResponseEntity
+        .status(BAD_REQUEST)
+        .body(ErrorResponse.of(ARGUMENT_NOT_VALID));
+  }
+
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<ErrorResponse> handleConstraintViolationException(
+      ConstraintViolationException e, HttpServletRequest request) {
     log.error("MethodArgumentTypeMismatchException is occurred. uri:{}",
         request.getRequestURI());
 
