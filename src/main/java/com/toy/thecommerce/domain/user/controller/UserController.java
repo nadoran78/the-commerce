@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "user", description = "회원 API")
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
@@ -55,7 +58,7 @@ public class UserController {
   @ApiResponse(responseCode = "200", description = "회원목록 조회 성공")
   public Page<UserListResponse> getUserList(
       @Parameter(description = "요청 페이지 숫자를 입력하세요.")
-      @Positive @RequestParam(defaultValue = "0") int page,
+      @Min(0) @RequestParam(defaultValue = "0") int page,
       @Parameter(description = "1페이지 당 보여줄 Element 숫자를 입력하세요.")
       @Positive @RequestParam(defaultValue = "10") int size,
       @Parameter(description = "정렬 기준을 입력해 주세요.(createdAt 또는 username 대소문자 구분 불필요)\n")
