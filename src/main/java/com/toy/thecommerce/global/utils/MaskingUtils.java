@@ -1,8 +1,5 @@
 package com.toy.thecommerce.global.utils;
 
-import com.toy.thecommerce.domain.user.dto.UserListResponse;
-import com.toy.thecommerce.domain.user.entity.User;
-
 public class MaskingUtils {
 
   /**
