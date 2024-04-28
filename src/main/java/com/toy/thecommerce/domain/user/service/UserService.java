@@ -6,7 +6,6 @@ import com.toy.thecommerce.domain.user.dto.UserListResponse;
 import com.toy.thecommerce.domain.user.entity.User;
 import com.toy.thecommerce.domain.user.exception.UserException;
 import com.toy.thecommerce.global.type.ErrorCode;
-import com.toy.thecommerce.global.utils.MaskingUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
