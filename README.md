@@ -12,6 +12,7 @@ The Commerce Toy project
   - swagger 적용: api 명세 확인 목적
     - 어플리케이션 구동 후 http://localhost:8080/swagger-ui/index.html 접속하여 api 명세서 확인
   - 예외 처리: CustomException 을 별도로 만들어 GlobalExceptionHandler 적용
+  - log AOP 적용: 메서드 실행 전 후 메서드명, 파라미터 type, value 출력
 
 ### 회원가입(/api/user/join)
   - POST 방식으로 Request Body에 파라미터 입력하여 요청(회워id, 비밀번호, 닉네임, 이름, 전화번호, 이메일)
