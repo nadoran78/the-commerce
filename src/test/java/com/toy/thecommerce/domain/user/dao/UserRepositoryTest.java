@@ -55,7 +55,7 @@ class UserRepositoryTest {
     assertEquals(9, resultList.get(1).getId());
     assertEquals(8, resultList.get(2).getId());
     assertEquals(7, resultList.get(3).getId());
-    assertEquals(7, resultList.get(4).getId());
+    assertEquals(6, resultList.get(4).getId());
 
 
   }
