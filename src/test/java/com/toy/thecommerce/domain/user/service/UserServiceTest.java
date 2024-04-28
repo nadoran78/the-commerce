@@ -1,7 +1,9 @@
 package com.toy.thecommerce.domain.user.service;
 
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -9,9 +11,13 @@ import static org.mockito.Mockito.verify;
 
 import com.toy.thecommerce.domain.user.dao.UserRepository;
 import com.toy.thecommerce.domain.user.dto.SignUpRequest;
+import com.toy.thecommerce.domain.user.dto.UserListResponse;
 import com.toy.thecommerce.domain.user.entity.User;
 import com.toy.thecommerce.domain.user.exception.UserException;
 import com.toy.thecommerce.global.type.ErrorCode;
+import com.toy.thecommerce.global.utils.MaskingUtils;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +25,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
@@ -110,5 +121,48 @@ class UserServiceTest {
     assertEquals(request.getUsername(), user.getUsername());
     assertEquals(request.getPhone(), user.getPhone());
     assertEquals(request.getEmail(), user.getEmail());
+  }
+
+  @Test
+  void successGetUserList() {
+    //given
+    PageRequest pageRequest = PageRequest.of(0, 10, Direction.DESC, "createdAt");
+    Page<User> users = makeUserPage(pageRequest);
+
+    given(userRepository.findAll(any(Pageable.class))).willReturn(users);
+    //when
+    Page<UserListResponse> result = userService.getUserList(pageRequest);
+
+    //then
+    List<User> userList = users.getContent();
+    List<UserListResponse> resultList = result.getContent();
+
+    assertEquals(10, result.getTotalElements());
+    assertEquals(userList.size(), resultList.size());
+    checkUserAndUserListResponseField(userList.get(0), resultList.get(0));
+    checkUserAndUserListResponseField(userList.get(1), resultList.get(1));
+  }
+
+  private void checkUserAndUserListResponseField(User user, UserListResponse response) {
+    assertEquals(MaskingUtils.maskingUserIdOrName(user.getUserId()), response.getUserId());
+    assertEquals(MaskingUtils.maskingUserIdOrName(user.getUsername()), response.getUsername());
+    assertEquals(MaskingUtils.maskingUserIdOrName(user.getNickname()), response.getNickname());
+    assertEquals(MaskingUtils.maskingPhone(user.getPhone()), response.getPhone());
+    assertEquals(MaskingUtils.maskingEmail(user.getEmail()), response.getEmail());
+  }
+
+  private Page<User> makeUserPage(Pageable pageable) {
+    List<User> userList = new ArrayList<>();
+    for (int i = 0; i < 2; i++) {
+      userList.add(User.builder()
+          .userId("userId" + i)
+          .password("password" + i)
+          .nickname("nickname" + i)
+          .username("username" + i)
+          .phone("0101234123" + i)
+          .email("email" + i + "@abcd.com")
+          .build());
+    }
+    return new PageImpl<>(userList, pageable, 10);
   }
 }
