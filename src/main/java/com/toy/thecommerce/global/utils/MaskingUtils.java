@@ -2,6 +2,8 @@ package com.toy.thecommerce.global.utils;
 
 public class MaskingUtils {
 
+  private static final String MASKING_PASSWORD = "********";
+
   /**
    * userId, nickname, username 마스킹 적용
    * value 길이가 1 또는 2인 경우 : 첫번째 문자를 * 처리 userId의 길이가 3 또는 4인 경우 :
@@ -45,6 +47,10 @@ public class MaskingUtils {
     } else {
       return phone.replaceAll("(\\d{3})(\\d{3,4})(\\d{4})", "$1-$2-$3");
     }
+  }
+
+  public static String getMaskingPassword() {
+    return MASKING_PASSWORD;
   }
 
 }

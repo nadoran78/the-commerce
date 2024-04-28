@@ -2,10 +2,13 @@ package com.toy.thecommerce.domain.user.service;
 
 import com.toy.thecommerce.domain.user.dao.UserRepository;
 import com.toy.thecommerce.domain.user.dto.SignUpRequest;
+import com.toy.thecommerce.domain.user.dto.UserInfoResponse;
+import com.toy.thecommerce.domain.user.dto.UserInfoUpdateRequest;
 import com.toy.thecommerce.domain.user.dto.UserListResponse;
 import com.toy.thecommerce.domain.user.entity.User;
 import com.toy.thecommerce.domain.user.exception.UserException;
 import com.toy.thecommerce.global.type.ErrorCode;
+import com.toy.thecommerce.global.utils.MaskingUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -45,5 +48,14 @@ public class UserService {
     return new PageImpl<>(userListResponses, pageable, pageResult.getTotalElements());
   }
 
+  public UserInfoResponse updateUserInfo(UserInfoUpdateRequest request, String userId) {
+    User user = userRepository.findByUserId(userId)
+        .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
 
+    user.updateUserInfo(request);
+
+    User savedUser = userRepository.save(user);
+
+    return UserInfoResponse.fromEntity(savedUser, MaskingUtils.getMaskingPassword());
+  }
 }

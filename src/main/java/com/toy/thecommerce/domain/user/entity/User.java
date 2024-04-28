@@ -3,6 +3,7 @@ package com.toy.thecommerce.domain.user.entity;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.toy.thecommerce.domain.user.dto.SignUpRequest;
+import com.toy.thecommerce.domain.user.dto.UserInfoUpdateRequest;
 import com.toy.thecommerce.global.entity.BaseEntity;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,7 +13,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -46,6 +46,13 @@ public class User extends BaseEntity {
         .phone(request.getPhone())
         .email(request.getEmail())
         .build();
+  }
+
+  public void updateUserInfo(UserInfoUpdateRequest request) {
+    this.nickname = request.getNickname();
+    this.username = request.getUsername();
+    this.phone = request.getPhone();
+    this.email = request.getEmail();
   }
 
 }
