@@ -3,6 +3,7 @@ package com.toy.thecommerce.domain.user.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -11,6 +12,8 @@ import static org.mockito.Mockito.verify;
 
 import com.toy.thecommerce.domain.user.dao.UserRepository;
 import com.toy.thecommerce.domain.user.dto.SignUpRequest;
+import com.toy.thecommerce.domain.user.dto.UserInfoResponse;
+import com.toy.thecommerce.domain.user.dto.UserInfoUpdateRequest;
 import com.toy.thecommerce.domain.user.dto.UserListResponse;
 import com.toy.thecommerce.domain.user.entity.User;
 import com.toy.thecommerce.domain.user.exception.UserException;
@@ -144,9 +147,12 @@ class UserServiceTest {
   }
 
   private void checkUserAndUserListResponseField(User user, UserListResponse response) {
-    assertEquals(MaskingUtils.maskingUserIdOrName(user.getUserId()), response.getUserId());
-    assertEquals(MaskingUtils.maskingUserIdOrName(user.getUsername()), response.getUsername());
-    assertEquals(MaskingUtils.maskingUserIdOrName(user.getNickname()), response.getNickname());
+    assertEquals(MaskingUtils.maskingUserIdOrName(user.getUserId()),
+        response.getUserId());
+    assertEquals(MaskingUtils.maskingUserIdOrName(user.getUsername()),
+        response.getUsername());
+    assertEquals(MaskingUtils.maskingUserIdOrName(user.getNickname()),
+        response.getNickname());
     assertEquals(MaskingUtils.maskingPhone(user.getPhone()), response.getPhone());
     assertEquals(MaskingUtils.maskingEmail(user.getEmail()), response.getEmail());
   }
@@ -164,5 +170,53 @@ class UserServiceTest {
           .build());
     }
     return new PageImpl<>(userList, pageable, 10);
+  }
+
+  @Test
+  void successUpdateUserInfo() {
+    //given
+    UserInfoUpdateRequest request = UserInfoUpdateRequest.builder()
+        .username("테스트")
+        .nickname("nickname")
+        .phone("010-9999-9999")
+        .email("test@test.com")
+        .build();
+    User user = User.builder()
+        .userId("userId")
+        .nickname("nin")
+        .username("use")
+        .phone("phone")
+        .email("email")
+        .build();
+
+    given(userRepository.findByUserId(anyString())).willReturn(Optional.of(user));
+    given(userRepository.save(any(User.class))).will(returnsFirstArg());
+    //when
+    UserInfoResponse response = userService.updateUserInfo(request, "userId");
+    //then
+    assertEquals(user.getUserId(), response.getUserId());
+    assertEquals("********", response.getPassword());
+    assertEquals(request.getUsername(), response.getUsername());
+    assertEquals(request.getNickname(), response.getNickname());
+    assertEquals(request.getPhone(), response.getPhone());
+    assertEquals(request.getEmail(), response.getEmail());
+  }
+
+  @Test
+  void updateUserInfo_throwUserNotFoundException_whenUserIsNotExist() {
+    //given
+    UserInfoUpdateRequest request = UserInfoUpdateRequest.builder()
+        .username("테스트")
+        .nickname("nickname")
+        .phone("010-9999-9999")
+        .email("test@test.com")
+        .build();
+
+    given(userRepository.findByUserId(anyString())).willReturn(Optional.empty());
+    //when
+    UserException userException = assertThrows(UserException.class,
+        () -> userService.updateUserInfo(request, "userId"));
+    //then
+    assertEquals(ErrorCode.USER_NOT_FOUND, userException.getErrorCode());
   }
 }

@@ -2,9 +2,11 @@ package com.toy.thecommerce.domain.user.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -12,6 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toy.thecommerce.domain.user.dto.SignUpRequest;
+import com.toy.thecommerce.domain.user.dto.UserInfoResponse;
+import com.toy.thecommerce.domain.user.dto.UserInfoUpdateRequest;
 import com.toy.thecommerce.domain.user.dto.UserListResponse;
 import com.toy.thecommerce.domain.user.service.UserService;
 import java.util.ArrayList;
@@ -96,7 +100,6 @@ class UserControllerTest {
         .andExpect(jsonPath("$.errors[?(@.field == '%s')]", "username").exists())
         .andExpect(jsonPath("$.errors[?(@.field == '%s')]", "phone").exists())
         .andExpect(jsonPath("$.errors[?(@.field == '%s')]", "email").exists());
-
   }
 
   private void checkSignUpRequestEachField(SignUpRequest request, SignUpRequest captor) {
@@ -153,11 +156,12 @@ class UserControllerTest {
   }
 
   @Test
-  void getUserList_throwArgumentNotValidException_whenInputInvalidPage() throws Exception {
+  void getUserList_throwArgumentNotValidException_whenInputInvalidPage()
+      throws Exception {
     //given
     //when & then
     mockMvc.perform(get("/api/user/list")
-        .contentType(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
             .param("page", "-1"))
         .andExpect(status().is(400))
         .andExpect(jsonPath("$.errorCode").value("ARGUMENT_NOT_VALID"))
@@ -167,7 +171,8 @@ class UserControllerTest {
   }
 
   @Test
-  void getUserList_throwArgumentNotValidException_whenInputInvalidSize() throws Exception {
+  void getUserList_throwArgumentNotValidException_whenInputInvalidSize()
+      throws Exception {
     //given
     //when & then
     mockMvc.perform(get("/api/user/list")
@@ -181,7 +186,8 @@ class UserControllerTest {
   }
 
   @Test
-  void getUserList_throwArgumentNotValidException_whenInputInvalidSort() throws Exception {
+  void getUserList_throwArgumentNotValidException_whenInputInvalidSort()
+      throws Exception {
     //given
     //when & then
     mockMvc.perform(get("/api/user/list")
@@ -192,5 +198,78 @@ class UserControllerTest {
         .andExpect(jsonPath("$.message").value("잘못된 입력입니다."))
         .andDo(print());
 
+  }
+
+  @Test
+  void successUpdateUserInfo() throws Exception {
+    //given
+    UserInfoUpdateRequest request = UserInfoUpdateRequest.builder()
+        .username("테스트")
+        .nickname("nickname")
+        .phone("010-9999-9999")
+        .email("test@test.com")
+        .build();
+
+    UserInfoResponse response = UserInfoResponse.builder()
+        .userId("userId")
+        .password("********")
+        .username("name")
+        .nickname("name")
+        .phone("010-1111-1111")
+        .email("abcd@abcd.com")
+        .build();
+
+    given(userService.updateUserInfo(any(UserInfoUpdateRequest.class),
+        anyString())).willReturn(response);
+    //when & then
+    ResultActions resultActions = mockMvc.perform(patch("/api/user/userId")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isOk())
+        .andDo(print());
+
+    checkUpdateRequestAndResponseField(resultActions, response);
+  }
+
+  @Test
+  void updateUserInfo_throwArgumentNotValidException_whenInputInvalidArgument() throws Exception {
+    //given
+    UserInfoUpdateRequest request = UserInfoUpdateRequest.builder()
+        .username("테스트!@#")
+        .nickname("nickname!@#")
+        .phone("010-9999-9999111")
+        .email("test@testcom")
+        .build();
+
+    //when & then
+    ResultActions resultActions = mockMvc.perform(patch("/api/user/userId")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().is(400))
+        .andDo(print());
+
+    checkArgumentNotValidEachFieldUpdate(resultActions);
+  }
+
+  private void checkUpdateRequestAndResponseField(ResultActions resultActions,
+      UserInfoResponse response) throws Exception {
+    resultActions
+        .andExpect(jsonPath("$.userId").value(response.getUserId()))
+        .andExpect(jsonPath("$.password").value(response.getPassword()))
+        .andExpect(jsonPath("$.username").value(response.getUsername()))
+        .andExpect(jsonPath("$.nickname").value(response.getNickname()))
+        .andExpect(jsonPath("$.phone").value(response.getPhone()))
+        .andExpect(jsonPath("$.email").value(response.getEmail()));
+  }
+
+  private void checkArgumentNotValidEachFieldUpdate(ResultActions resultActions)
+      throws Exception {
+    resultActions
+        .andExpect(jsonPath("$.errorCode").value("ARGUMENT_NOT_VALID"))
+        .andExpect(jsonPath("$.message").value("잘못된 입력입니다."))
+        .andExpect(jsonPath("$.errors[?(@.field == '%s')]", "nickname").exists())
+        .andExpect(jsonPath("$.errors[?(@.field == '%s')]", "username").exists())
+        .andExpect(jsonPath("$.errors[?(@.field == '%s')]", "phone").exists())
+        .andExpect(jsonPath("$.errors[?(@.field == '%s')]", "email").exists());
   }
 }
