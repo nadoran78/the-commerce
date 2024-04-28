@@ -34,7 +34,7 @@ The Commerce Toy project
 
 ### 회원 정보 수정(/api/user/{로그인 아이디})
   - PATCH 방식
-  - 수정 가능한 정보 : username, nickname, phone, emial(userId, password 변경은 별도 api 구성하여 진행하는 것이 보안상 좋을 것으로 판단함.)
+  - 수정 가능한 정보 : username, nickname, phone, email(userId, password 변경은 별도 api 구성하여 진행하는 것이 보안상 좋을 것으로 판단함.)
   - Request Body에 username, nickname, phone, email 입력하여 요청(수정하지 않을 인자는 기존 정보 그대로 요청)
   - 로그인 아이디를 입력받아 회원 기가입 여부 확인(미가입 시 예외 발생)
   - 로그인 아이디와 입력받은 파라미터를 통해 본인 회원정보 수정
